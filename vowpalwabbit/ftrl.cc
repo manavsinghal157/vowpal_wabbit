@@ -263,7 +263,7 @@ void update_after_prediction_proximal(ftrl& b, example& ec)
     }
     else
     {
-      b.all->weights.dense_weights.set_tag(hashall(ec.tag.begin(),ec.tag.size(),b.all->hash_seed)%b.all->feature_bitset_num_bits; // find the 5-bit hash of the tag for dense weights
+      b.all->weights.dense_weights.set_tag(hashall(ec.tag.begin(),ec.tag.size(),b.all->hash_seed)%b.all->feature_bitset_num_bits); // find the 5-bit hash of the tag for dense weights
       GD::foreach_feature<ftrl_update_data, inner_update_proximal>(*b.all, ec, b.data);
       b.all->weights.dense_weights.unset_tag(); // set the tag to false after the example has been trained on
     }
