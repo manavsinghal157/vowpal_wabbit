@@ -2545,4 +2545,14 @@ train-sets/ref/slates_simple_w_interactions.stderr
 ./negative-test.sh {VW} --no_stdin --cb_explore_adf --cover 3 --noconstant --quiet -i model-sets/truncated_model
     train-sets/ref/truncated_model_crash.stdout
 
+# Test 357: test privacy_activation command line argument
+{VW} --privacy_activation -d train-sets/privacy_dataset --invert_hash readable_model_privacy.txt --cbify 2 --cb_adf -f model_privacy.vw
+    train-sets/ref/privacy_dataset.stderr
+    pred-sets/ref/readable_model_privacy.txt
+
+# Test 358: test privacy_activation command line argument with no tags input
+{VW} --privacy_activation -d train-sets/privacy_dataset_no_tags --invert_hash readable_model_privacy_no_tags.txt --cbify 2 --cb_adf -f model_privacy_no_tags.vw
+    train-sets/ref/privacy_no_tags.stderr
+    pred-sets/ref/readable_model_privacy_no_tags.txt
+    
 # Do not delete this line or the empty line above it

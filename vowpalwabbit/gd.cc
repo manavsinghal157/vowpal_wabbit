@@ -669,7 +669,34 @@ void update(gd& g, base_learner&, example& ec)
   float update;
   if ((update = compute_update<sparse_l2, invariant, sqrt_rate, feature_mask_off, adax, adaptive, normalized, spare>(
            g, ec)) != 0.)
-    train<sqrt_rate, feature_mask_off, adaptive, normalized, spare>(g, ec, update);
+  {
+    if (g.all->weights.sparse)
+    {
+      if (g.all->privacy_activation)
+      {
+        g.all->weights.sparse_weights.set_tag(ec.tag_hash);
+        train<sqrt_rate, feature_mask_off, adaptive, normalized, spare>(g, ec, update);
+        g.all->weights.sparse_weights.unset_tag();
+      }
+      else
+      {
+        train<sqrt_rate, feature_mask_off, adaptive, normalized, spare>(g, ec, update);
+      }
+    }
+    else
+    {
+      if (g.all->privacy_activation)
+      {
+        g.all->weights.dense_weights.set_tag(ec.tag_hash);
+        train<sqrt_rate, feature_mask_off, adaptive, normalized, spare>(g, ec, update);
+        g.all->weights.dense_weights.unset_tag();
+      }
+      else
+      {
+        train<sqrt_rate, feature_mask_off, adaptive, normalized, spare>(g, ec, update);
+      }
+    }
+  }
 
   if (g.all->sd->contraction < 1e-9 || g.all->sd->gravity > 1e3)  // updating weights now to avoid numerical instability
     sync_weights(*g.all);
@@ -733,7 +760,7 @@ void save_load_regressor(vw& all, io_buf& model_file, bool read, bool text, T& w
     for (auto it = weights.begin(); it != weights.end(); ++it)
     {
       const auto weight_value = *it;
-      if (*it != 0.f)
+      if (*it != 0.f && (!all.privacy_activation || (weights.is_activated(it.index()) && all.privacy_activation)))
       {
         const auto weight_index = it.index() >> weights.stride_shift();
 
@@ -776,8 +803,7 @@ void save_load_regressor(vw& all, io_buf& model_file, bool read, bool text, T& w
   else  // write
   {
     for (typename T::iterator v = weights.begin(); v != weights.end(); ++v)
-    {
-      if (*v != 0.)
+      if (*v != 0. && (!all.privacy_activation || (weights.is_activated(v.index()) && all.privacy_activation)))
       {
         i = v.index() >> weights.stride_shift();
         std::stringstream msg;
@@ -785,7 +811,6 @@ void save_load_regressor(vw& all, io_buf& model_file, bool read, bool text, T& w
         msg << ":" << *v << "\n";
         brw += bin_text_write_fixed(model_file, (char*)&(*v), sizeof(*v), msg, text);
       }
-    }
   }
 }
 
@@ -843,7 +868,7 @@ void save_load_online_state(
 
       if (all.print_invert)  // write readable model with feature names
       {
-        if (*v != 0.f)
+        if (*v != 0.f && (!all.privacy_activation || (weights.is_activated(v.index()) && all.privacy_activation)))
         {
           const auto map_it = all.index_name_map.find(i);
           if (map_it != all.index_name_map.end())

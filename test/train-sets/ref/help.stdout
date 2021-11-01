@@ -43,6 +43,13 @@ Diagnostic options:
 Randomization options:
   --random_seed arg     seed random number generator
 Feature options:
+  --privacy_activation                  turns on aggregated weight exporting when 
+                                        the unique feature tags cross 
+                                        `privacy_activation_threshold`
+  --privacy_activation_threshold arg    takes effect when `privacy_activation` is 
+                                        turned on and is the number of unique tag 
+                                        hashes a weight needs to see before it is 
+                                        exported
   --hash arg                            how to hash the features. Available 
                                         options: strings, all
   --hash_seed arg (=0, )                seed for hash function
