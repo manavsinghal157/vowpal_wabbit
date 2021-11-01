@@ -130,7 +130,11 @@ uint32_t cache_numbits(VW::io::reader& cache_reader)
       sizeof(cache_numbits))
   { THROW("failed to read"); }
 
+<<<<<<< HEAD
 >>>>>>> 65a403fed39a7c635778da75244088a82d1dbeb0
+=======
+>>>>>>> upstream/master
+>>>>>>> master
   return cache_numbits;
 }
 
