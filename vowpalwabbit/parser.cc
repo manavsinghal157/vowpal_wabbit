@@ -122,15 +122,10 @@ uint32_t cache_numbits(VW::io::reader& cache_reader)
   if (marker != 'c') THROW("data file is not a cache file");
 
   uint32_t cache_numbits;
-<<<<<<< HEAD
-  if (io_buf::read_file(filepointer, &cache_numbits, sizeof(cache_numbits)) < static_cast<int>(sizeof(cache_numbits)))
-  { return true; }
-=======
   if (static_cast<size_t>(cache_reader.read(reinterpret_cast<char*>(&cache_numbits), sizeof(cache_numbits))) <
       sizeof(cache_numbits))
   { THROW("failed to read"); }
 
->>>>>>> upstream/master
   return cache_numbits;
 }
 
